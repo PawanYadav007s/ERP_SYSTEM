@@ -1,0 +1,16 @@
+<!-- billing/templates/billing/bill_pdf.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Invoice PDF</title>
+  <style>
+    /* Your PDF styles here */
+  </style>
+</head>
+<body>
+  <h1>Invoice #{{ invoice.id }}</h1>
+  <p>Customer: {{ invoice.customer.name }}</p>
+  <p>Date: {{ invoice.date }}</p>
+  <!-- Add more invoice details as needed -->
+</body>
+</html>

@@ -42,8 +42,10 @@ INSTALLED_APPS = [
     # Custom apps
     'hr',
     'inventory',
-    'sales',
     'production',
+    'sales',
+    'billing',
+
     'accounts',
 ]
 

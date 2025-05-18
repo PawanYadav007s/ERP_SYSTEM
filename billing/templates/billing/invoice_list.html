@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Invoices</h2>
+<a href="{% url 'billing:invoice_create' %}">Create New Invoice</a>
+<table border="1" cellpadding="5" cellspacing="0" style="width:100%; margin-top: 15px;">
+    <thead>
+        <tr>
+            <th>Invoice Number</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Total Amount</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice in invoices %}
+        <tr>
+            <td>{{ invoice.invoice_number }}</td>
+            <td>{{ invoice.customer.name }}</td>
+            <td>{{ invoice.date|date:"d/m/Y" }}</td>
+            <td>{{ invoice.total|floatformat:2 }}</td>
+            <td>
+                <a href="{% url 'billing:invoice_detail' invoice.pk %}">View</a> |
+                <a href="{% url 'billing:invoice_pdf' invoice.pk %}" target="_blank">PDF</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No invoices found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

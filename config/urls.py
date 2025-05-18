@@ -22,14 +22,18 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
-     path('', lambda request: redirect('login', permanent=False)),
+    path('', lambda request: redirect('login', permanent=False)),
     path('admin/', admin.site.urls),
     path('hr/', include('hr.urls')),
-    path('inventory/',include('inventory.urls')),
+    path('inventory/', include('inventory.urls')),
+    path('production/', include('production.urls')),
+    path('accounts/', include('accounts.urls')),
     path('sales/', include('sales.urls')),
-    path('production/',include('production.urls')),
-    path('accounts/',include('accounts.urls')),
+    path('billing/', include('billing.urls')),
+
+
 ]
+
 
 # Important: Add this OUTSIDE the urlpatterns list
 # This serves media files in development

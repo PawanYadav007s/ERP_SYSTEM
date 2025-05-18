@@ -1,50 +1,14 @@
-<!-- sales/templates/sales/customer_form.html -->
-{% extends 'base.html' %}
-
-{% block title %}{% if customer %}Edit{% else %}Add{% endif %} Customer{% endblock %}
+{% extends "base.html" %}
+{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Customer{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">{% if customer %}Edit{% else %}Add{% endif %} Customer</h4>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        {% csrf_token %}
-                        
-                        <div class="mb-3">
-                            <label for="id_name" class="form-label">Name *</label>
-                            <input type="text" name="name" class="form-control" id="id_name" required value="{{ customer.name|default:'' }}">
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="id_address" class="form-label">Address *</label>
-                            <textarea name="address" class="form-control" id="id_address" rows="3" required>{{ customer.address|default:'' }}</textarea>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="id_gstin" class="form-label">GSTIN</label>
-                                <input type="text" name="gstin" class="form-control" id="id_gstin" value="{{ customer.gstin|default:'' }}">
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="id_phone" class="form-label">Phone</label>
-                                <input type="text" name="phone" class="form-control" id="id_phone" value="{{ customer.phone|default:'' }}">
-                            </div>
-                        </div>
-                        
-                        <div class="d-flex justify-content-end">
-                            <a href="{% url 'sales:customer_list' %}" class="btn btn-secondary me-2">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Save Customer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <h2>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Customer</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Save</button>
+        <a href="{% url 'customer_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
 </div>
 {% endblock %}

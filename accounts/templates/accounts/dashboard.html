@@ -52,8 +52,14 @@
                     </a>
                 </li>
                 <li class="nav-item mb-2">
-                    <a class="nav-link" href="{% url 'sales:bill_list' %}">
-                        <i class="bi bi-file-earmark-text me-2"></i> Sales & Billing
+                    <a class="nav-link" href="{% url 'customer_list' %}">
+                        <i class="bi bi-people-fill me-2"></i> Customers
+                    </a>
+                </li>
+                <!-- Added Billing nav item -->
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{% url 'billing:invoice_list' %}">
+                        <i class="bi bi-receipt-cutoff me-2"></i> Billing
                     </a>
                 </li>
 
@@ -95,6 +101,17 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">👥 Customers</h5>
+                            <p class="card-text">Manage customers, their contacts, and GST details.</p>
+                            <a href="{% url 'customer_list' %}" class="btn btn-primary">Go to Customers</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-md-6 mb-3">
                     <div class="card shadow-sm">
                         <div class="card-body">
@@ -104,15 +121,18 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Added Billing card -->
                 <div class="col-md-6 mb-3">
                     <div class="card shadow-sm">
                         <div class="card-body">
-                            <h5 class="card-title">🧾 Sales & Billing</h5>
-                            <p class="card-text">Create invoices and manage customer billing records.</p>
-                            <a href="{% url 'sales:bill_list' %}" class="btn btn-primary">Go to Billing</a>
+                            <h5 class="card-title">💰 Billing</h5>
+                            <p class="card-text">Create invoices and manage billing records.</p>
+                            <a href="{% url 'billing:invoice_list' %}" class="btn btn-primary">Go to Billing</a>
                         </div>
                     </div>
                 </div>
+
                 <div class="col-md-6 mb-3">
                     <div class="card shadow-sm">
                         <div class="card-body">
