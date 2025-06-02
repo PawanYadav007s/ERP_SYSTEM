@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+<<<<<<< HEAD
     path('', lambda request: redirect('login', permanent=False)),
     path('admin/', admin.site.urls),
     path('hr/', include('hr.urls')),
@@ -35,6 +36,18 @@ urlpatterns = [
 ]
 
 
+=======
+     path('', lambda request: redirect('login', permanent=False)),
+    path('admin/', admin.site.urls),
+    path('hr/', include('hr.urls')),
+    path('inventory/',include('inventory.urls')),
+    path('sales/', include('sales.urls')),
+    path('production/',include('production.urls')),
+    path('accounts/',include('accounts.urls')),
+    path('purchase/', include('purchase.urls')),
+]
+
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
 # Important: Add this OUTSIDE the urlpatterns list
 # This serves media files in development
 if settings.DEBUG:

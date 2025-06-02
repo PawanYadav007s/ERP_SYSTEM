@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+{% load sales_filters %}
+<head>
+    <title>Purchase Order #{{ order.po_number }}</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .no-print { display: none; }
+            @page { size: A4; margin: 1cm; }
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+        .header h2 {
+            margin: 0;
+            font-size: 24px;
+            color: #333;
+        }
+        .header p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .po-title {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        .details {
+            margin-bottom: 20px;
+        }
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .details-left, .details-right {
+            width: 48%;
+        }
+        .details-right {
+            text-align: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .text-right {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .footer {
+            margin-top: 50px;
+        }
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 80px;
+        }
+        .signature-box {
+            width: 40%;
+            text-align: center;
+            border-top: 1px solid #000;
+            padding-top: 5px;
+        }
+        .terms {
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            font-size: 12px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-draft { background-color: #6c757d; color: white; }
+        .status-confirmed { background-color: #ffc107; color: black; }
+        .status-received { background-color: #28a745; color: white; }
+        .status-cancelled { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Company Header -->
+        <div class="header">
+            <h2>SHREE RAJLAXMI BUILDING MATERIAL SUPPLIERS</h2>
+            <p><strong>Suppliers of : M-Sand, Bricks, Crush Sand</strong></p>
+            <p>Ravidarshan, Hadapsar, Pune - 411 028 | Phone: 98860271717 / 8805047117</p>
+            <p>GSTIN : 27LYCPK5908E1ZC | Email: rajlaxmibuildingmaterial@gmail.com</p>
+        </div>
+        
+        <div class="po-title">PURCHASE ORDER</div>
+        
+        <!-- Status Badge -->
+        <div class="text-center" style="margin-bottom: 20px;">
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        
+        <!-- Supplier and PO Details -->
+        <div class="details">
+            <div class="details-row">
+                <div class="details-left">
+                    <strong>To:</strong><br>
+                    <strong style="font-size: 16px;">{{ order.supplier.name }}</strong><br>
+                    {{ order.supplier.address }}<br>
+                    Phone: {{ order.supplier.phone }}<br>
+                    {% if order.supplier.gstin %}GSTIN: {{ order.supplier.gstin }}{% endif %}
+                </div>
+                <div class="details-right">
+                    <strong>PO Number:</strong> {{ order.po_number }}<br>
+                    <strong>Date:</strong> {{ order.date|date:"d/m/Y" }}<br>
+                    <strong>Expected Delivery:</strong> {{ order.delivery_date|date:"d/m/Y"|default:"TBD" }}<br>
+                    {% if order.reference_number %}
+                    <strong>Your Ref:</strong> {{ order.reference_number }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Items Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 5%">S.No</th>
+                    <th style="width: 45%">Material Description</th>
+                    <th style="width: 15%">Quantity</th>
+                    <th style="width: 15%">Rate</th>
+                    <th style="width: 20%">Amount ₹</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td>{{ item.material.name }}</td>
+                    <td class="text-center">{{ item.quantity }} {{ item.material.unit }}</td>
+                    <td class="text-right">{{ item.rate|floatformat:2 }}</td>
+                    <td class="text-right">{{ item.amount|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                
+                <!-- Add empty rows for better layout -->
+                {% with items_count=order.items.count %}
+                    {% if items_count < 8 %}
+                        {% for i in "x"|rjust:8 %}
+                            {% if forloop.counter <= 8|add:"-"|add:items_count %}
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" class="text-right"><strong>Subtotal</strong></td>
+                    <td class="text-right"><strong>{{ order.subtotal|floatformat:2 }}</strong></td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-right">Add CGST @ {{ order.gst_rate|floatformat:1|divide:2 }}%</td>
+                    <td class="text-right">{{ order.cgst_amount|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-right">Add SGST @ {{ order.gst_rate|floatformat:1|divide:2 }}%</td>
+                    <td class="text-right">{{ order.sgst_amount|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4" class="text-right"><strong>Grand Total</strong></td>
+                    <td class="text-right"><strong>₹ {{ order.total_amount|floatformat:2 }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+        
+        {% if order.notes %}
+        <div style="margin: 20px 0;">
+            <strong>Notes:</strong> {{ order.notes }}
+        </div>
+        {% endif %}
+        
+        <!-- Terms and Conditions -->
+        <div class="terms">
+            <strong>Terms & Conditions:</strong>
+            <ol style="margin: 5px 0; padding-left: 20px;">
+                <li>Please deliver the materials as per specifications mentioned above.</li>
+                <li>Materials should be delivered to our site at the address mentioned.</li>
+                <li>Quality should be as per approved samples.</li>
+                <li>Payment will be made as per agreed terms after delivery and verification.</li>
+                <li>This purchase order is subject to the terms and conditions of our company.</li>
+            </ol>
+        </div>
+        
+        <!-- Bank Details (if available) -->
+        {% if order.supplier.bank_name %}
+        <div style="margin-top: 20px; padding: 10px; background-color: #f0f0f0;">
+            <strong>Bank Details for Payment:</strong><br>
+            Bank: {{ order.supplier.bank_name }}<br>
+            Account No: {{ order.supplier.bank_account }}<br>
+            IFSC Code: {{ order.supplier.bank_ifsc }}
+        </div>
+        {% endif %}
+        
+        <!-- Signature Section -->
+        <div class="signature-section">
+            <div class="signature-box">
+                <p>Authorized By</p>
+                <p style="margin-top: 10px;">SHREE RAJLAXMI BUILDING MATERIAL SUPPLIERS</p>
+            </div>
+            <div class="signature-box">
+                <p>Accepted By</p>
+                <p style="margin-top: 10px;">{{ order.supplier.name }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="no-print" style="text-align: center; margin-top: 20px;">
+        <button onclick="window.print()" class="btn btn-primary">Print Purchase Order</button>
+        <button onclick="window.close()" class="btn btn-secondary">Close</button>
+    </div>
+</body>
+</html>

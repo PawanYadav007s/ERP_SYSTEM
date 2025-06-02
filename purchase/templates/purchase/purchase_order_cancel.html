@@ -1,0 +1,64 @@
+{% extends 'purchase/base_purchase.html' %}
+
+{% block title %}Cancel Purchase Order{% endblock %}
+
+{% block purchase_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Cancel Purchase Order #{{ order.po_number }}</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Confirm Cancellation</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> Are you sure you want to cancel this purchase order?
+                    <p class="mb-0 mt-2">This action cannot be undone.</p>
+                </div>
+                
+                <h6>Order Details:</h6>
+                <dl class="row">
+                    <dt class="col-sm-3">PO Number:</dt>
+                    <dd class="col-sm-9">{{ order.po_number }}</dd>
+                    
+                    <dt class="col-sm-3">Supplier:</dt>
+                    <dd class="col-sm-9">{{ order.supplier.name }}</dd>
+                    
+                    <dt class="col-sm-3">Date:</dt>
+                    <dd class="col-sm-9">{{ order.date|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-3">Total Amount:</dt>
+                    <dd class="col-sm-9">₹{{ order.total_amount|floatformat:2 }}</dd>
+                    
+                    <dt class="col-sm-3">Current Status:</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge bg-{% if order.status == 'draft' %}secondary{% else %}warning{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </dd>
+                </dl>
+                
+                <h6>Items in this order:</h6>
+                <ul>
+                    {% for item in order.items.all %}
+                    <li>{{ item.material.name }} - {{ item.quantity }} {{ item.material.unit }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'purchase_order_detail' order.pk %}" class="btn btn-secondary">Back</a>
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this purchase order?')">
+                            Confirm Cancellation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

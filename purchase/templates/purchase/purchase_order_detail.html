@@ -1,0 +1,127 @@
+{% extends 'purchase/base_purchase.html' %}
+{% load sales_filters %}
+{% block title %}Purchase Order #{{ order.po_number }}{% endblock %}
+
+{% block purchase_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Purchase Order #{{ order.po_number }}</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        {% if order.status == 'draft' %}
+            <a href="{% url 'purchase_order_update' order.pk %}" class="btn btn-sm btn-outline-primary me-2">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+            <a href="{% url 'purchase_order_confirm' order.pk %}" class="btn btn-sm btn-success me-2">
+                <i class="bi bi-check-circle"></i> Confirm Order
+            </a>
+        {% elif order.status == 'confirmed' %}
+            <a href="{% url 'purchase_order_receive' order.pk %}" class="btn btn-sm btn-success me-2">
+                <i class="bi bi-box-arrow-in-down"></i> Mark as Received
+            </a>
+        {% endif %}
+        
+        <a href="{% url 'purchase_order_print' order.pk %}" class="btn btn-sm btn-primary me-2" target="_blank">
+            <i class="bi bi-printer"></i> Print
+        </a>
+        
+        {% if order.status in 'draft,confirmed' %}
+            <a href="{% url 'purchase_order_cancel' order.pk %}" class="btn btn-sm btn-danger">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Status Alert -->
+{% if order.status == 'cancelled' %}
+<div class="alert alert-danger">
+    <strong>This purchase order has been cancelled.</strong>
+</div>
+{% elif order.status == 'received' %}
+<div class="alert alert-success">
+    <strong>This order has been received and inventory has been updated.</strong>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <!-- Order Header -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Supplier Details</h5>
+                        <strong>{{ order.supplier.name }}</strong><br>
+                        {{ order.supplier.address }}<br>
+                        Phone: {{ order.supplier.phone }}<br>
+                        {% if order.supplier.gstin %}GSTIN: {{ order.supplier.gstin }}{% endif %}
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <h5>Order Details</h5>
+                        <strong>PO Number:</strong> {{ order.po_number }}<br>
+                        <strong>Date:</strong> {{ order.date|date:"d/m/Y" }}<br>
+                        <strong>Expected Delivery:</strong> {{ order.delivery_date|date:"d/m/Y"|default:"-" }}<br>
+                        <strong>Status:</strong> 
+                        <span class="badge bg-{% if order.status == 'draft' %}secondary{% elif order.status == 'confirmed' %}warning{% elif order.status == 'received' %}success{% else %}danger{% endif %}">
+                            {{ order.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                
+                {% if order.reference_number %}
+                <div class="row mb-3">
+                    <div class="col">
+                        <strong>Supplier Reference:</strong> {{ order.reference_number }}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Items Table -->
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>{{ item.material.name }}</td>
+                            <td>{{ item.quantity }} {{ item.material.unit }}</td>
+                            <td>₹{{ item.rate|floatformat:2 }}</td>
+                            <td class="text-end">₹{{ item.amount|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Subtotal</strong></td>
+                            <td class="text-end"><strong>₹{{ order.subtotal|floatformat:2 }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end">CGST @ {{ order.gst_rate|floatformat:1|divide:2 }}%</td>
+                            <td class="text-end">₹{{ order.cgst_amount|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end">SGST @ {{ order.gst_rate|floatformat:1|divide:2 }}%</td>
+                            <td class="text-end">₹{{ order.sgst_amount|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total Amount</strong></td>
+                            <td class="text-end"><strong>₹{{ order.total_amount|floatformat:2 }}</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+                
+                {% if order.notes %}
+                <div class="mt-3">
+                    <strong>Notes:</strong> {{ order.notes }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

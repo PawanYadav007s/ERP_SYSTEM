@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 {% block title %}Customers{% endblock %}
 
@@ -13,6 +14,46 @@
                 <th>State</th>
                 <th>Phone</th>
                 <th>Email</th>
+=======
+{% extends 'sales/base_sales.html' %}
+
+{% block title %}Customers - Sales{% endblock %}
+
+{% block sales_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Customers</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'customer_create' %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-circle"></i> Add Customer
+        </a>
+    </div>
+</div>
+
+<!-- Search Form -->
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form method="get" class="d-flex">
+            <input type="text" name="search" class="form-control me-2" 
+                   placeholder="Search by name, phone, or GSTIN" 
+                   value="{{ search_query }}">
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+            {% if search_query %}
+            <a href="{% url 'customer_list' %}" class="btn btn-outline-danger ms-2">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- Customer Table -->
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>GSTIN</th>
+                <th>Address</th>
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
                 <th>Actions</th>
             </tr>
         </thead>
@@ -20,6 +61,7 @@
             {% for customer in customers %}
             <tr>
                 <td>{{ customer.name }}</td>
+<<<<<<< HEAD
                 <td>{{ customer.gstin }}</td>
                 <td>{{ customer.state }}</td>
                 <td>{{ customer.phone }}</td>
@@ -31,8 +73,27 @@
             </tr>
             {% empty %}
             <tr><td colspan="6">No customers found.</td></tr>
+=======
+                <td>{{ customer.phone }}</td>
+                <td>{{ customer.gstin|default:"-" }}</td>
+                <td>{{ customer.address_site|truncatewords:10 }}</td>
+                <td>
+                    <a href="{% url 'customer_detail' customer.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                    <a href="{% url 'customer_update' customer.pk %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center">No customers found</td>
+            </tr>
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endblock %}
+<<<<<<< HEAD
+=======
+
+               
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)

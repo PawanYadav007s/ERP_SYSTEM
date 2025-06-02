@@ -42,7 +42,11 @@
             <h4 class="text-white mb-4">🔧 ERP System</h4>
             <ul class="nav flex-column">
                 <li class="nav-item mb-2">
+<<<<<<< HEAD
                     <a class="nav-link" href="{% url 'employee_list' %}">
+=======
+                    <a class="nav-link" href="{% url 'hr_dashboard' %}">
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
                         <i class="bi bi-people-fill me-2"></i> HR Module
                     </a>
                 </li>
@@ -52,6 +56,7 @@
                     </a>
                 </li>
                 <li class="nav-item mb-2">
+<<<<<<< HEAD
                     <a class="nav-link" href="{% url 'customer_list' %}">
                         <i class="bi bi-people-fill me-2"></i> Customers
                     </a>
@@ -60,6 +65,17 @@
                 <li class="nav-item mb-2">
                     <a class="nav-link" href="{% url 'billing:invoice_list' %}">
                         <i class="bi bi-receipt-cutoff me-2"></i> Billing
+=======
+                    <a class="nav-link" href="{% url 'sales_dashboard' %}">
+                        <i class="bi bi-cart-fill me-2"></i> Sales & Billing
+                    </a>
+                </li>
+
+                <!-- Add to sidebar after Sales & Billing -->
+                <li class="nav-item mb-2">
+                    <a class="nav-link" href="{% url 'purchase_dashboard' %}">
+                        <i class="bi bi-bag-fill me-2"></i> Purchase
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
                     </a>
                 </li>
 
@@ -101,6 +117,7 @@
                         </div>
                     </div>
                 </div>
+<<<<<<< HEAD
 
                 <div class="col-md-6 mb-3">
                     <div class="card shadow-sm">
@@ -112,11 +129,14 @@
                     </div>
                 </div>
 
+=======
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
                 <div class="col-md-6 mb-3">
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <h5 class="card-title">👥 HR Module</h5>
                             <p class="card-text">View and manage employee records.</p>
+<<<<<<< HEAD
                             <a href="{% url 'employee_list' %}" class="btn btn-primary">Go to HR</a>
                         </div>
                     </div>
@@ -129,6 +149,29 @@
                             <h5 class="card-title">💰 Billing</h5>
                             <p class="card-text">Create invoices and manage billing records.</p>
                             <a href="{% url 'billing:invoice_list' %}" class="btn btn-primary">Go to Billing</a>
+=======
+                            <a href="{% url 'hr_dashboard' %}" class="btn btn-primary">Go to HR</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">💰 Sales & Billing</h5>
+                            <p class="card-text">Manage customers, create invoices, and track sales.</p>
+                            <a href="{% url 'sales_dashboard' %}" class="btn btn-primary">Go to Sales</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add this card to the main dashboard -->
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">📦 Purchase Management</h5>
+                            <p class="card-text">
+                            <p class="card-text">Manage suppliers and create purchase orders for stock-in.</p>
+                            <a href="{% url 'purchase_dashboard' %}" class="btn btn-primary">Go to Purchase</a>
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
                         </div>
                     </div>
                 </div>

@@ -1,22 +1,8 @@
-<<<<<<< HEAD
-{% extends "base.html" %}
-{% block title %}{% if form.instance.pk %}Edit{% else %}Add{% endif %} Customer{% endblock %}
+{% extends 'purchase/base_purchase.html' %}
 
-{% block content %}
-<div class="container mt-4">
-    <h2>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Customer</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="btn btn-success">Save</button>
-        <a href="{% url 'customer_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
-=======
-{% extends 'sales/base_sales.html' %}
+{% block title %}{{ title }} - Purchase{% endblock %}
 
-{% block title %}{{ title }} - Sales{% endblock %}
-
-{% block sales_content %}
+{% block purchase_content %}
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2">{{ title }}</h1>
 </div>
@@ -28,7 +14,7 @@
                 <form method="post">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label class="form-label">Customer Name *</label>
+                        <label class="form-label">Supplier Name *</label>
                         {{ form.name }}
                         {% if form.name.errors %}
                             <div class="text-danger">{{ form.name.errors }}</div>
@@ -62,23 +48,38 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label class="form-label">Site/Delivery Address *</label>
-                        {{ form.address_site }}
-                        {% if form.address_site.errors %}
-                            <div class="text-danger">{{ form.address_site.errors }}</div>
+                        <label class="form-label">Address *</label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                            <div class="text-danger">{{ form.address.errors }}</div>
                         {% endif %}
                     </div>
                     
+                    <h6 class="mt-4">Bank Details (Optional)</h6>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Bank Name</label>
+                            {{ form.bank_name }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Account Number</label>
+                            {{ form.bank_account }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">IFSC Code</label>
+                            {{ form.bank_ifsc }}
+                        </div>
+                    </div>
+                    
                     <div class="d-flex justify-content-between">
-                        <a href="{% url 'customer_list' %}" class="btn btn-secondary">Cancel</a>
+                        <a href="{% url 'supplier_list' %}" class="btn btn-secondary">Cancel</a>
                         <button type="submit" class="btn btn-primary">
-                            {% if customer %}Update{% else %}Create{% endif %} Customer
+                            {% if supplier %}Update{% else %}Create{% endif %} Supplier
                         </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
->>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
 </div>
 {% endblock %}

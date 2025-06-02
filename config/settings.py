@@ -42,10 +42,16 @@ INSTALLED_APPS = [
     # Custom apps
     'hr',
     'inventory',
+<<<<<<< HEAD
     'production',
     'sales',
     'billing',
 
+=======
+    'sales',
+    'purchase',
+    'production',
+>>>>>>> e3e9bf4 (all working code added remaining inventory and admin panel app userinterface else other functionalities works properly)
     'accounts',
 ]
 
