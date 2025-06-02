@@ -1,0 +1,8 @@
+Django>=4.2,<5.0
+mysqlclient>=2.1.1
+python-dotenv
+gunicorn
+whitenoise
+django-bootstrap-v5
+# Optional Dev Tools
+ipython

@@ -1,0 +1,78 @@
+{% extends 'sales/base_sales.html' %}
+
+{% block title %}Invoices - Sales{% endblock %}
+
+{% block sales_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Invoices</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'invoice_create' %}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-circle"></i> Create Invoice
+        </a>
+    </div>
+</div>
+
+<!-- Search and Filter Form -->
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control" 
+                       placeholder="Search by bill no. or customer" 
+                       value="{{ search_query }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="date_from" class="form-control" 
+                       placeholder="From Date" value="{{ date_from }}">
+            </div>
+            <div class="col-md-3">
+                <input type="date" name="date_to" class="form-control" 
+                       placeholder="To Date" value="{{ date_to }}">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Filter</button>
+                {% if search_query or date_from or date_to %}
+                <a href="{% url 'invoice_list' %}" class="btn btn-outline-danger w-100 mt-2">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Invoice Table -->
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Bill No.</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total Amount</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for invoice in invoices %}
+            <tr>
+                <td><strong>{{ invoice.bill_number }}</strong></td>
+                <td>{{ invoice.date|date:"d/m/Y" }}</td>
+                <td>{{ invoice.customer.name }}</td>
+                <td>{{ invoice.items.count }}</td>
+                <td>₹{{ invoice.total_amount|floatformat:2 }}</td>
+                <td>
+                    <a href="{% url 'invoice_detail' invoice.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                    <a href="{% url 'invoice_print' invoice.pk %}" class="btn btn-sm btn-outline-secondary" target="_blank">
+                        <i class="bi bi-printer"></i> Print
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No invoices found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

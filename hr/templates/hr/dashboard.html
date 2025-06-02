@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>HR Dashboard</h2>
+    
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Employees</h5>
+                    <h3 class="card-text">{{ total_employees }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Present Today</h5>
+                    <h3 class="card-text">{{ present_count }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Absent Today</h5>
+                    <h3 class="card-text">{{ absent_count }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Departments</h5>
+                    <h3 class="card-text">{{ departments.count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Pending Leave Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_leaves %}
+                        <ul class="list-group">
+                            {% for leave in recent_leaves %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>{{ leave.employee.full_name }}</strong> - {{ leave.get_leave_type_display }}
+                                            <br>
+                                            <small>{{ leave.start_date }} to {{ leave.end_date }}</small>
+                                        </div>
+                                        <a href="{% url 'leave_approval' leave.id %}" class="btn btn-sm btn-primary">Review</a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-muted">No pending leave requests.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'employee_create' %}" class="btn btn-primary">Add New Employee</a>
+                        <a href="{% url 'bulk_attendance' %}" class="btn btn-success">Record Attendance</a>
+                        <a href="{% url 'leave_apply' %}" class="btn btn-info">Apply for Leave</a>
+                        <a href="{% url 'salary_create' %}" class="btn btn-warning">Add Salary Record</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

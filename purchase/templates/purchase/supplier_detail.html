@@ -1,0 +1,107 @@
+{% extends 'purchase/base_purchase.html' %}
+
+{% block title %}{{ supplier.name }} - Supplier Details{% endblock %}
+
+{% block purchase_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Supplier Details</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'supplier_update' supplier.pk %}" class="btn btn-sm btn-outline-primary me-2">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a href="{% url 'purchase_order_create' %}?supplier={{ supplier.pk }}" class="btn btn-sm btn-primary">
+            <i class="bi bi-plus-circle"></i> New Purchase Order
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Supplier Information</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Name:</dt>
+                    <dd class="col-sm-8">{{ supplier.name }}</dd>
+                    
+                    <dt class="col-sm-4">Phone:</dt>
+                    <dd class="col-sm-8">{{ supplier.phone }}</dd>
+                    
+                    <dt class="col-sm-4">Email:</dt>
+                    <dd class="col-sm-8">{{ supplier.email|default:"-" }}</dd>
+                    
+                    <dt class="col-sm-4">GSTIN:</dt>
+                    <dd class="col-sm-8">{{ supplier.gstin|default:"-" }}</dd>
+                    
+                    <dt class="col-sm-4">Address:</dt>
+                    <dd class="col-sm-8">{{ supplier.address }}</dd>
+                </dl>
+                
+                {% if supplier.bank_name %}
+                <h6 class="mt-3">Bank Details</h6>
+                <dl class="row">
+                    <dt class="col-sm-4">Bank:</dt>
+                    <dd class="col-sm-8">{{ supplier.bank_name }}</dd>
+                    
+                    <dt class="col-sm-4">Account:</dt>
+                    <dd class="col-sm-8">{{ supplier.bank_account|default:"-" }}</dd>
+                    
+                    <dt class="col-sm-4">IFSC:</dt>
+                    <dd class="col-sm-8">{{ supplier.bank_ifsc|default:"-" }}</dd>
+                </dl>
+                {% endif %}
+                
+                <div class="mt-3">
+                    <strong>Total Business:</strong> ₹{{ total_business|floatformat:2 }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Recent Purchase Orders</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>PO Number</th>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                            <tr>
+                                <td>{{ order.po_number }}</td>
+                                <td>{{ order.date|date:"d/m/Y" }}</td>
+                                <td>₹{{ order.total_amount|floatformat:2 }}</td>
+                                <td>
+                                    <span class="badge bg-{% if order.status == 'draft' %}secondary{% elif order.status == 'confirmed' %}warning{% elif order.status == 'received' %}success{% else %}danger{% endif %}">
+                                        {{ order.get_status_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{% url 'purchase_order_detail' order.pk %}" class="btn btn-sm btn-outline-primary">View</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No purchase orders found</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

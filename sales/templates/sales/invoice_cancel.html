@@ -1,0 +1,66 @@
+{% extends 'sales/base_sales.html' %}
+
+{% block title %}Cancel Invoice #{{ invoice.bill_number }}{% endblock %}
+
+{% block sales_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Cancel Invoice #{{ invoice.bill_number }}</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">Confirm Invoice Cancellation</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> Cancelling this invoice will:
+                    <ul>
+                        <li>Mark the invoice as cancelled in the system</li>
+                        <li>Reverse all stock transactions (items will be added back to inventory)</li>
+                        <li>This action cannot be undone</li>
+                    </ul>
+                </div>
+                
+                <h6>Invoice Details:</h6>
+                <dl class="row">
+                    <dt class="col-sm-3">Bill Number:</dt>
+                    <dd class="col-sm-9">{{ invoice.bill_number }}</dd>
+                    
+                    <dt class="col-sm-3">Customer:</dt>
+                    <dd class="col-sm-9">{{ invoice.customer.name }}</dd>
+                    
+                    <dt class="col-sm-3">Date:</dt>
+                    <dd class="col-sm-9">{{ invoice.date|date:"d/m/Y" }}</dd>
+                    
+                    <dt class="col-sm-3">Total Amount:</dt>
+                    <dd class="col-sm-9">₹{{ invoice.total_amount|floatformat:2 }}</dd>
+                </dl>
+                
+                <h6>Items to be reversed:</h6>
+                <ul>
+                    {% for item in invoice.items.all %}
+                    <li>{{ item.material.name }} - {{ item.quantity }} {{ item.material.unit }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Cancellation Reason *</label>
+                        <textarea name="cancellation_reason" class="form-control" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'invoice_detail' invoice.pk %}" class="btn btn-secondary">Back</a>
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this invoice?')">
+                            Confirm Cancellation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

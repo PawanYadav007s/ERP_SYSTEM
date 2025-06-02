@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Employee Details</h2>
+        <div>
+            <a href="{% url 'employee_update' employee.id %}" class="btn btn-warning">Edit</a>
+            <a href="{% url 'employee_list' %}" class="btn btn-secondary">Back to List</a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    {% if employee.profile_image %}
+                        <img src="{{ employee.profile_image.url }}" alt="{{ employee.full_name }}" class="rounded-circle img-fluid mb-3" style="max-width: 150px;">
+                    {% else %}
+                        <div class="bg-light rounded-circle d-inline-flex justify-content-center align-items-center mb-3" style="width: 150px; height: 150px;">
+                            <span class="display-4 text-muted">{{ employee.first_name.0 }}{{ employee.last_name.0 }}</span>
+                        </div>
+                    {% endif %}
+                    <h4>{{ employee.first_name }} {{ employee.last_name }}</h4>
+                    <p class="text-muted">{{ employee.position }}</p>
+                    <p class="badge bg-primary">{{ employee.department.name|default:"No Department" }}</p>
+                    <p>
+                        {% if employee.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            
+            {% if current_salary %}
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Salary Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Basic Salary:</strong> ₹{{ current_salary.basic_salary }}</p>
+                        <p><strong>Allowances:</strong> ₹{{ current_salary.allowances }}</p>
+                        <p><strong>Deductions:</strong> ₹{{ current_salary.deductions }}</p>
+                        <p><strong>Net Salary:</strong> ₹{{ current_salary.net_salary }}</p>
+                        <p><small class="text-muted">Effective from: {{ current_salary.effective_date }}</small></p>
+                        <div class="d-grid">
+                            <a href="{% url 'salary_detail' current_salary.id %}" class="btn btn-sm btn-info">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0">Salary Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">No salary information available.</p>
+                        <div class="d-grid">
+                            <a href="{% url 'employee_salary_create' employee.id %}" class="btn btn-sm btn-primary">Add Salary Details</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Personal Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Employee ID:</strong> {{ employee.employee_id }}</p>
+                            <p><strong>Date of Birth:</strong> {{ employee.date_of_birth|default:"Not set" }}</p>
+                            <p><strong>Gender:</strong> {{ employee.get_gender_display }}</p>
+                            <p><strong>Email:</strong> {{ employee.email }}</p>
+                            <p><strong>Phone:</strong> {{ employee.phone|default:"Not available" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Address:</strong> {{ employee.address|default:"Not available" }}</p>
+                            <p><strong>Date Joined:</strong> {{ employee.date_joined }}</p>
+                            <p><strong>Aadhar Number:</strong> {{ employee.aadhar_number|default:"Not available" }}</p>
+                            <p><strong>PAN Number:</strong> {{ employee.pan_number|default:"Not available" }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Recent Attendance</h5>
+                            <a href="{% url 'attendance_list' %}?employee={{ employee.id }}" class="btn btn-sm btn-link">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if attendance_records %}
+                                <ul class="list-group list-group-flush">
+                                    {% for attendance in attendance_records %}
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between">
+                                                <span>{{ attendance.date }}</span>
+                                                <span class="badge {% if attendance.status == 'present' %}bg-success{% elif attendance.status == 'absent' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                    {{ attendance.get_status_display }}
+                                                </span>
+                                            </div>
+                                            {% if attendance.time_in %}
+                                                <small class="text-muted">In: {{ attendance.time_in }}{% if attendance.time_out %} - Out: {{ attendance.time_out }}{% endif %}</small>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div class="p-3 text-center text-muted">
+                                    No attendance records found.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Leave Records</h5>
+                            <a href="{% url 'leave_list' %}?employee={{ employee.id }}" class="btn btn-sm btn-link">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if leave_records %}
+                                <ul class="list-group list-group-flush">
+                                    {% for leave in leave_records %}
+                                        <li class="list-group-item">
+                                            <div class="d-flex justify-content-between">
+                                                <span>{{ leave.get_leave_type_display }}</span>
+                                                <span class="badge {% if leave.status == 'approved' %}bg-success{% elif leave.status == 'rejected' %}bg-danger{% else %}bg-warning{% endif %}">
+                                                    {{ leave.get_status_display }}
+                                                </span>
+                                            </div>
+                                            <small class="text-muted">{{ leave.start_date }} to {{ leave.end_date }}</small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <div class="p-3 text-center text-muted">
+                                    No leave records found.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

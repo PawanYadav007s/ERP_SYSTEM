@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Bulk Attendance</h2>
+        <a href="{% url 'attendance_list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.date.id_for_label }}">Date</label>
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                                <div class="text-danger">{{ form.date.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="{{ form.department.id_for_label }}">Department (Optional)</label>
+                            {{ form.department }}
+                            {% if form.department.errors %}
+                                <div class="text-danger">{{ form.department.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">{{ form.department.help_text }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary mb-4">Load Employees</button>
+                
+                {% if employees %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Employee</th>
+                                    <th>Status</th>
+                                    <th>Time In</th>
+                                    <th>Time Out</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for employee in employees %}
+                                    <tr>
+                                        <td>{{ employee.first_name }} {{ employee.last_name }}</td>
+                                        <td>
+                                            <select name="status_{{ employee.id }}" class="form-select">
+                                                <option value="present">Present</option>
+                                                <option value="absent">Absent</option>
+                                                <option value="half_day">Half Day</option>
+                                                <option value="leave">Leave</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="time" name="time_in_{{ employee.id }}" class="form-control" value="09:00">
+                                        </td>
+                                        <td>
+                                            <input type="time" name="time_out_{{ employee.id }}" class="form-control" value="18:00">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="notes_{{ employee.id }}" class="form-control">
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-success" name="submit_attendance">Save Attendance</button>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add Bootstrap classes to form elements
+        document.getElementById('{{ form.date.id_for_label }}').classList.add('form-control');
+        document.getElementById('{{ form.department.id_for_label }}').classList.add('form-select');
+    });
+</script>
+{% endblock %}

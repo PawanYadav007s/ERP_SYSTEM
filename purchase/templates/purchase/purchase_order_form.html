@@ -1,0 +1,304 @@
+{% extends 'purchase/base_purchase.html' %}
+
+{% block title %}{{ title }} - Purchase{% endblock %}
+
+{% block extra_css %}
+<style>
+    .formset-row {
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+    }
+    .delete-row {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block purchase_content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">{{ title }}</h1>
+</div>
+
+<form method="post" id="purchase-form">
+    {% csrf_token %}
+    
+    <!-- Purchase Order Header -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Purchase Order Details</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Supplier *</label>
+                    {{ form.supplier }}
+                    <a href="{% url 'supplier_create' %}?next=po" class="btn btn-sm btn-link">Add New Supplier</a>
+                    {% if form.supplier.errors %}
+                        <div class="text-danger">{{ form.supplier.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Order Date *</label>
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                        <div class="text-danger">{{ form.date.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Expected Delivery</label>
+                    {{ form.delivery_date }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">Supplier Bill/Invoice No.</label>
+                    {{ form.reference_number }}
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label">GST Rate (%)</label>
+                    {{ form.gst_rate }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Notes</label>
+                    {{ form.notes }}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Purchase Order Items -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Order Items</h5>
+        </div>
+        <div class="card-body">
+            {{ formset.management_form }}
+            
+            <div class="table-responsive">
+                <table class="table" id="items-table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="formset-tbody">
+                        {% for form in formset %}
+                        <tr class="formset-row">
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            <td>{{ form.material }}</td>
+                            <td>{{ form.quantity }}</td>
+                            <td>{{ form.rate }}</td>
+                            <td class="amount-cell">0.00</td>
+                            <td>
+                                {% if form.instance.pk %}{{ form.DELETE }}{% endif %}
+                                <button type="button" class="btn btn-sm btn-danger delete-row">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Subtotal:</strong></td>
+                            <td colspan="2"><strong id="subtotal">0.00</strong></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end">CGST (2.5%):</td>
+                            <td colspan="2" id="cgst">0.00</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end">SGST (2.5%):</td>
+                            <td colspan="2" id="sgst">0.00</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                            <td colspan="2"><strong id="total">0.00</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            
+            <button type="button" class="btn btn-sm btn-secondary" id="add-row">
+                <i class="bi bi-plus"></i> Add Row
+            </button>
+        </div>
+    </div>
+    
+    <div class="d-flex justify-content-between">
+        <a href="{% url 'purchase_order_list' %}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">
+            {% if order %}Update{% else %}Create{% endif %} Purchase Order
+        </button>
+    </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Function to update form indices
+    function updateFormIndices() {
+        let formCount = 0;
+        $('#formset-tbody tr.formset-row').each(function(index) {
+            // Skip forms marked for deletion
+            if (!$(this).hasClass('d-none')) {
+                $(this).find('input, select, textarea').each(function() {
+                    let name = $(this).attr('name');
+                    let id = $(this).attr('id');
+                    
+                    if (name) {
+                        name = name.replace(/-\d+-/, '-' + index + '-');
+                        $(this).attr('name', name);
+                    }
+                    
+                    if (id) {
+                        id = id.replace(/-\d+-/, '-' + index + '-');
+                        $(this).attr('id', id);
+                    }
+                });
+                formCount++;
+            }
+        });
+        $('#id_items-TOTAL_FORMS').val(formCount);
+    }
+
+    // Calculate amounts
+    function calculateAmount(row) {
+        var qty = parseFloat(row.find('.quantity-input').val()) || 0;
+        var rate = parseFloat(row.find('.rate-input').val()) || 0;
+        var amount = qty * rate;
+        row.find('.amount-cell').text(amount.toFixed(2));
+        calculateTotals();
+    }
+    
+    function calculateTotals() {
+        var subtotal = 0;
+        $('.formset-row').each(function() {
+            // Skip deleted rows
+            if (!$(this).hasClass('d-none') && !$(this).find('input[name$="-DELETE"]').is(':checked')) {
+                var amount = parseFloat($(this).find('.amount-cell').text()) || 0;
+                subtotal += amount;
+            }
+        });
+        
+        var gstRate = parseFloat($('#id_gst_rate').val()) || 5;
+        var gstAmount = subtotal * (gstRate / 100);
+        var cgst = gstAmount / 2;
+        var sgst = gstAmount / 2;
+        var total = subtotal + gstAmount;
+        
+        $('#subtotal').text(subtotal.toFixed(2));
+        $('#cgst').text(cgst.toFixed(2));
+        $('#sgst').text(sgst.toFixed(2));
+        $('#total').text(total.toFixed(2));
+    }
+    
+    // Material selection change
+    $(document).on('change', '.material-select', function() {
+        var materialId = $(this).val();
+        var row = $(this).closest('tr');
+        
+        if (materialId) {
+            $.ajax({
+                url: "{% url 'get_material_purchase_price' 0 %}".replace('0', materialId),
+                success: function(data) {
+                    if (data.success) {
+                        row.find('.rate-input').val(data.purchase_price);
+                        calculateAmount(row);
+                    }
+                }
+            });
+        }
+    });
+    
+    // Quantity or rate change
+    $(document).on('input', '.quantity-input, .rate-input', function() {
+        var row = $(this).closest('tr');
+        calculateAmount(row);
+    });
+    
+    // Add new row
+    $('#add-row').click(function() {
+        var totalForms = parseInt($('#id_items-TOTAL_FORMS').val());
+        var newRow = $('.formset-row:first').clone(true);
+        
+        // Clear the cloned row
+        newRow.removeClass('d-none');
+        newRow.find('input:not([type=hidden]), select').val('');
+        newRow.find('.amount-cell').text('0.00');
+        
+        // Update attributes
+        newRow.find('input, select, textarea').each(function() {
+            var name = $(this).attr('name');
+            var id = $(this).attr('id');
+            
+            if (name) {
+                name = name.replace(/-\d+-/, '-' + totalForms + '-');
+                $(this).attr('name', name);
+            }
+            
+            if (id) {
+                id = id.replace(/-\d+-/, '-' + totalForms + '-');
+                $(this).attr('id', id);
+            }
+        });
+        
+        // Remove DELETE checkbox if exists
+        newRow.find('input[name$="-DELETE"]').remove();
+        newRow.find('label[for$="-DELETE"]').remove();
+        
+        // Append to table
+        $('#formset-tbody').append(newRow);
+        
+        // Update form count
+        $('#id_items-TOTAL_FORMS').val(totalForms + 1);
+        
+        return false;
+    });
+    
+    // Delete row
+    $(document).on('click', '.delete-row', function() {
+        var row = $(this).closest('tr');
+        var totalForms = $('.formset-row:visible').length;
+        
+        if (totalForms > 1) {
+            var deleteInput = row.find('input[name$="-DELETE"]');
+            if (deleteInput.length > 0) {
+                // Existing row - mark for deletion
+                deleteInput.prop('checked', true);
+                row.addClass('d-none');
+            } else {
+                // New row - just remove it
+                row.remove();
+            }
+            updateFormIndices();
+            calculateTotals();
+        } else {
+            alert('At least one item is required');
+        }
+        
+        return false;
+    });
+    
+    // GST rate change
+    $('#id_gst_rate').on('input', function() {
+        calculateTotals();
+    });
+    
+    // Initial calculation
+    $('.formset-row').each(function() {
+        calculateAmount($(this));
+    });
+});
+</script>
+{% endblock %}
+
